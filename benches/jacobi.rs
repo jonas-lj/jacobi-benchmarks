@@ -26,9 +26,10 @@ mod jacobi_benchmarks {
 
                         let mut m_bytes = vec![0u8; size / 8];
                         prng.fill_bytes(&mut m_bytes);
+                        m_bytes[0] |= 1; // Ensure odd
 
-                        let a = BigInt::from_bytes_be(num_bigint::Sign::Plus, &a_bytes);
-                        let m = BigInt::from_bytes_be(num_bigint::Sign::Plus, &m_bytes);
+                        let a = BigInt::from_bytes_le(num_bigint::Sign::Plus, &a_bytes);
+                        let m = BigInt::from_bytes_le(num_bigint::Sign::Plus, &m_bytes);
                         (a, m)
                     },
                     |(a, m)| jacobi_base(&a, &m),
@@ -45,9 +46,10 @@ mod jacobi_benchmarks {
 
                         let mut m_bytes = vec![0u8; size / 8];
                         prng.fill_bytes(&mut m_bytes);
+                        m_bytes[0] |= 1; // Ensure odd
 
-                        let a = BigInt::from_bytes_be(num_bigint::Sign::Plus, &a_bytes);
-                        let m = BigInt::from_bytes_be(num_bigint::Sign::Plus, &m_bytes);
+                        let a = BigInt::from_bytes_le(num_bigint::Sign::Plus, &a_bytes);
+                        let m = BigInt::from_bytes_le(num_bigint::Sign::Plus, &m_bytes);
                         (a, m)
                     },
                     |(a, m)| jacobi_new(&a, &m),
@@ -64,12 +66,13 @@ mod jacobi_benchmarks {
 
                         let mut m_bytes = vec![0u8; size / 8];
                         prng.fill_bytes(&mut m_bytes);
+                        m_bytes[0] |= 1; // Ensure odd
 
-                        let a = num_bigint_dig::BigInt::from_bytes_be(
+                        let a = num_bigint_dig::BigInt::from_bytes_le(
                             num_bigint_dig::Sign::Plus,
                             &a_bytes,
                         );
-                        let m = num_bigint_dig::BigInt::from_bytes_be(
+                        let m = num_bigint_dig::BigInt::from_bytes_le(
                             num_bigint_dig::Sign::Plus,
                             &m_bytes,
                         );

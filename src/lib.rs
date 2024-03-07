@@ -4,9 +4,23 @@ use num_traits::{One, Signed, Zero};
 use std::mem::swap;
 use std::ops::{RemAssign, ShrAssign};
 
-pub fn jacobi_base(a: &BigInt, m: &BigInt) -> Option<i8> {
+#[test]
+fn test_jacobi_base() {
+    let a = BigInt::from(10);
+    let m = BigInt::from(21);
+    assert_eq!(jacobi_base(&a, &m), -1);
+}
+
+#[test]
+fn test_jacobi_new() {
+    let a = BigInt::from(10);
+    let m = BigInt::from(21);
+    assert_eq!(jacobi_new(&a, &m), -1);
+}
+
+pub fn jacobi_base(a: &BigInt, m: &BigInt) -> i8 {
     if !m.is_positive() || m.is_even() {
-        return None;
+        panic!("Invalid input");
     }
 
     // After the reduction, we know that both a and m are positive
@@ -34,14 +48,14 @@ pub fn jacobi_base(a: &BigInt, m: &BigInt) -> Option<i8> {
     }
 
     if m.is_one() {
-        return Some(if t { 1 } else { -1 });
+        return if t { 1 } else { -1 };
     }
-    Some(0)
+    0
 }
 
-pub fn jacobi_new(a: &BigInt, m: &BigInt) -> Option<i8> {
+pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
     if !m.is_positive() || m.is_even() {
-        return None;
+        panic!("Invalid input");
     }
 
     // After the reduction, we know that both a and m are positive
@@ -80,9 +94,9 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> Option<i8> {
     }
 
     if m.is_one() {
-        return Some(if t { 1 } else { -1 });
+        return if t { 1 } else { -1 };
     }
-    Some(0)
+    0
 }
 
 pub fn jacobi_num_bigint_dig(a: &num_bigint_dig::BigInt, m: &num_bigint_dig::BigInt) -> Option<i8> {
