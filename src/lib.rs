@@ -55,12 +55,15 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> Option<i8> {
     let mut m_2nd_bit = m.bit(1);
 
     while !a.is_zero() {
-        // Shift a to the right until odd and store the parity of the number of shifts
-        let s_odd = into_odd_part_and_2_adic_valuation(&mut a);
-
         // To check if m is 3 or 5 mod 8 we check that only one of the second and third bits are set
-        if s_odd && (m_2nd_bit ^ m.bit(2)) {
-            t = !t;
+        let n = m_2nd_bit ^ m.bit(2);
+
+        // Shift a to the right until odd and store the parity of the number of shifts
+        while a.is_even() {
+            a.shr_assign(1);
+            if n {
+                t = !t;
+            }
         }
 
         swap(&mut a, &mut m);
@@ -80,17 +83,6 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> Option<i8> {
         return Some(if t { 1 } else { -1 });
     }
     Some(0)
-}
-
-/// Given an integer a, find the largest power of two s such that a = 2^s * b for some odd b. Set
-/// a = b and return a boolean indicating whether s is odd.
-fn into_odd_part_and_2_adic_valuation(a: &mut BigUint) -> bool {
-    let mut s = false;
-    while a.is_even() {
-        a.shr_assign(1);
-        s = !s;
-    }
-    s
 }
 
 pub fn jacobi_num_bigint_dig(a: &num_bigint_dig::BigInt, m: &num_bigint_dig::BigInt) -> Option<i8> {
