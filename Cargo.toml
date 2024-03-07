@@ -1,0 +1,18 @@
+[package]
+name = "jacobi_benchmarks"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+num-bigint = "0.4.4"
+num-bigint-dig = "0.8.4"
+num-integer = "0.1.44"
+num-traits = "0.2.18"
+
+[dev-dependencies]
+criterion = "0.5.1"
+rand = "0.8.4"
+
+[[bench]]
+name = "jacobi"
+harness = false
