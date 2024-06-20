@@ -69,27 +69,22 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
     let mut m_2nd_bit = m.bit(1);
 
     while !a.is_zero() {
-        // To check if m is 3 or 5 mod 8 we check that only one of the second and third bits are set
-        let n = m_2nd_bit ^ m.bit(2);
-
-        // Shift a to the right until odd and store the parity of the number of shifts
-        while a.is_even() {
-            a.shr_assign(1);
-            if n {
-                t = !t;
-            }
+        // Remove all trailing zeros from a and adjust t accordingly
+        let trailing_zeros = a.trailing_zeros().expect("a is not zero");
+        if !trailing_zeros.is_zero() {
+            a.shr_assign(trailing_zeros);
         }
 
+        // Swap a and m
         swap(&mut a, &mut m);
-
-        // a and m have been swapped
         let a_2nd_bit = m_2nd_bit;
-        m_2nd_bit = m.bit(1);
 
-        // Check if both a and m are 3 mod 4
-        if a_2nd_bit && m_2nd_bit {
+        // Check if the sign needs to be negated
+        m_2nd_bit = m.bit(1);
+        if (a_2nd_bit && !m_2nd_bit) ^ (a.bit(2) && trailing_zeros.is_odd()) {
             t = !t;
         }
+
         a.rem_assign(&m);
     }
 
