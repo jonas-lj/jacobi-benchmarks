@@ -1,8 +1,9 @@
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
 use num_traits::{One, Signed, Zero};
-use std::mem::swap;
+use std::mem::{replace, swap};
 use std::ops::{RemAssign, ShrAssign};
+use rand::{Rng, thread_rng};
 
 #[test]
 fn test_jacobi_base() {
@@ -16,6 +17,16 @@ fn test_jacobi_new() {
     let a = BigInt::from(10);
     let m = BigInt::from(21);
     assert_eq!(jacobi_new(&a, &m), -1);
+
+    let mut rnd = thread_rng();
+    for _ in 0..100 {
+        let mut a = BigInt::from(rnd.gen_range(3..1000));
+        a.set_bit(0, true);
+        let mut m = BigInt::from(rnd.gen_range(3..1000));
+        m.set_bit(0, true);
+        println!("a = {}, m = {}", a, m);
+        assert_eq!(jacobi_base(&a, &m), jacobi_new(&a, &m));
+    }
 }
 
 pub fn jacobi_base(a: &BigInt, m: &BigInt) -> i8 {
@@ -66,7 +77,7 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
     let mut t = true;
 
     // The second bit of m
-    let mut m_2nd_bit = m.bit(1);
+    let mut m_2 = m.bit(1);
 
     while !a.is_zero() {
         // Remove all trailing zeros from a and adjust t accordingly
@@ -77,11 +88,9 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
 
         // Swap a and m
         swap(&mut a, &mut m);
-        let a_2nd_bit = m_2nd_bit;
+        let a_2 = replace(&mut m_2, m.bit(1));
 
-        // Check if the sign needs to be negated
-        m_2nd_bit = m.bit(1);
-        if (a_2nd_bit && !m_2nd_bit) ^ (a.bit(2) && trailing_zeros.is_odd()) {
+        if (trailing_zeros.is_odd() && (a.bit(2) ^ a_2)) ^ (m_2 && a_2) {
             t = !t;
         }
 
