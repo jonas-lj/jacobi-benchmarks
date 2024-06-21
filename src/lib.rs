@@ -84,7 +84,6 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
 
     // The second bit of m (will be a after swap)
     let mut m_2 = m.bit(1);
-    let mut a_2;
 
     while !a.is_zero() {
         // Remove all trailing zeros from a and adjust t accordingly
@@ -93,7 +92,7 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
             a.shr_assign(trailing_zeros);
         }
 
-        a_2 = a.bit(1);
+        let a_2 = a.bit(1);
         if (trailing_zeros.is_odd() && (m.bit(2) ^ m_2)) ^ (a_2 && m_2) {
             t = !t;
         }
