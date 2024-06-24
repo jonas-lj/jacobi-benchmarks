@@ -14,6 +14,5 @@ The output of the benchmarks from a Macbook Pro M1 is as follows. All timings ar
 | Base                | 15.58    | 35.476   | 55.605   | 79.086   | 131.5    | 191.9    | 541.61   | 1091.5   | 
 | New                 | 3.9589   | 9.883    | 17.15    | 23.423   | 37.026   | 53.229   | 146.26   | 287.22   | 
 | num-bigint-dig      | 6.1464   | 17.199   | 32.904   | 45.877   | 75.78    | 105.62   | 259.33   | 521.38   | 
-| ------------------- | -------- | -------- | -------- | -------- | -------- | -------- | -------- | -------- | 
 
 To run the benchmarks, run `cargo bench` in the root of the repo.
