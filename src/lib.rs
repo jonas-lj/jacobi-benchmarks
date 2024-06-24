@@ -1,8 +1,12 @@
+use std::mem::swap;
+use std::ops::{RemAssign, ShrAssign};
+
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
 use num_traits::{One, Signed, Zero};
-use std::mem::swap;
-use std::ops::{RemAssign, ShrAssign};
+
+#[cfg(test)]
+use rand::{thread_rng, Rng};
 
 #[test]
 fn test_jacobi_base() {
@@ -16,6 +20,21 @@ fn test_jacobi_new() {
     let a = BigInt::from(10);
     let m = BigInt::from(21);
     assert_eq!(jacobi_new(&a, &m), -1);
+
+    let mut rnd = thread_rng();
+    for _ in 0..100 {
+        let mut a = BigInt::from(rnd.gen_range(3..1000));
+        let mut m = BigInt::from(rnd.gen_range(3..1000));
+
+        // Ensure inputs are odd
+        a.set_bit(0, true);
+        m.set_bit(0, true);
+
+        let result = jacobi_new(&a, &m);
+        println!("a = {}, m = {}, (a/m) = {}", a, m, result);
+        let expected = jacobi_base(&a, &m);
+        assert_eq!(expected, result);
+    }
 }
 
 pub fn jacobi_base(a: &BigInt, m: &BigInt) -> i8 {
@@ -65,31 +84,24 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
     // The output
     let mut t = true;
 
-    // The second bit of m
-    let mut m_2nd_bit = m.bit(1);
+    // The second bit of m (will be a after swap)
+    let mut m_2 = m.bit(1);
 
     while !a.is_zero() {
-        // To check if m is 3 or 5 mod 8 we check that only one of the second and third bits are set
-        let n = m_2nd_bit ^ m.bit(2);
-
-        // Shift a to the right until odd and store the parity of the number of shifts
-        while a.is_even() {
-            a.shr_assign(1);
-            if n {
-                t = !t;
-            }
+        // Remove all trailing zeros from a and adjust t accordingly
+        let trailing_zeros = a.trailing_zeros().expect("a is not zero");
+        if !trailing_zeros.is_zero() {
+            a.shr_assign(trailing_zeros);
         }
 
-        swap(&mut a, &mut m);
-
-        // a and m have been swapped
-        let a_2nd_bit = m_2nd_bit;
-        m_2nd_bit = m.bit(1);
-
-        // Check if both a and m are 3 mod 4
-        if a_2nd_bit && m_2nd_bit {
+        let a_2 = a.bit(1);
+        if (trailing_zeros.is_odd() && (m_2 ^ m.bit(2))) ^ (m_2 && a_2) {
             t = !t;
         }
+
+        // Swap a and m
+        m_2 = a_2;
+        swap(&mut a, &mut m);
         a.rem_assign(&m);
     }
 
