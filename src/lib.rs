@@ -4,6 +4,8 @@ use std::ops::{RemAssign, ShrAssign};
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
 use num_traits::{One, Signed, Zero};
+
+#[cfg(test)]
 use rand::{thread_rng, Rng};
 
 #[test]
@@ -93,7 +95,7 @@ pub fn jacobi_new(a: &BigInt, m: &BigInt) -> i8 {
         }
 
         let a_2 = a.bit(1);
-        if (trailing_zeros.is_odd() && (m.bit(2) ^ m_2)) ^ (a_2 && m_2) {
+        if (trailing_zeros.is_odd() && (m_2 ^ m.bit(2))) ^ (m_2 && a_2) {
             t = !t;
         }
 
