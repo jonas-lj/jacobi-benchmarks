@@ -2,7 +2,7 @@ use criterion::criterion_main;
 
 mod jacobi_benchmarks {
     use criterion::{criterion_group, BatchSize, BenchmarkGroup, Criterion};
-    use jacobi_benchmarks::{jacobi_base, jacobi_new, jacobi_num_bigint_dig};
+    use jacobi_benchmarks::{jacobi_base, jacobi_new, jacobi_taiko, jacobi_num_bigint_dig};
     use num_bigint::BigInt;
     use rand::rngs::ThreadRng;
     use rand::{thread_rng, RngCore};
@@ -53,6 +53,36 @@ mod jacobi_benchmarks {
                         (a, m)
                     },
                     |(a, m)| jacobi_new(&a, &m),
+                    BatchSize::SmallInput,
+                )
+            });
+
+            let mut prng: ThreadRng = thread_rng();
+            group.bench_function(format!("Taiko/{}", size), move |b| {
+                b.iter_batched(
+                    || {
+                        let mut a_bytes = vec![0u8; size / 8];
+                        prng.fill_bytes(&mut a_bytes);
+
+                        let mut m_bytes = vec![0u8; size / 8];
+                        prng.fill_bytes(&mut m_bytes);
+                        m_bytes[0] |= 1; // Ensure odd
+
+                        let a = BigInt::from_bytes_le(num_bigint::Sign::Plus, &a_bytes);
+                        let m = BigInt::from_bytes_le(num_bigint::Sign::Plus, &m_bytes);
+                        (a.to_u64_digits().1, m.to_u64_digits().1)
+                    },
+                    |(a, m)| {
+                        // TODO: change the impl to accept dynamic sizes
+                        if size <= 128 { jacobi_taiko::<3>(&a, &m); }
+                        else if size <= 256 { jacobi_taiko::<5>(&a, &m); }
+                        else if size <= 384 { jacobi_taiko::<7>(&a, &m); }
+                        else if size <= 512 { jacobi_taiko::<9>(&a, &m); }
+                        else if size <= 768 { jacobi_taiko::<13>(&a, &m); }
+                        else if size <= 1024 { jacobi_taiko::<17>(&a, &m); }
+                        else if size <= 2048 { jacobi_taiko::<33>(&a, &m); }
+                        else if size <= 3072 { jacobi_taiko::<49>(&a, &m); }
+                    },
                     BatchSize::SmallInput,
                 )
             });

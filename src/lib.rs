@@ -5,6 +5,9 @@ use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
 use num_traits::{One, Signed, Zero};
 
+mod jacobi_taiko;
+pub use jacobi_taiko::jacobi as jacobi_taiko;
+
 #[cfg(test)]
 use rand::{thread_rng, Rng};
 
@@ -34,6 +37,9 @@ fn test_jacobi_new() {
         println!("a = {}, m = {}, (a/m) = {}", a, m, result);
         let expected = jacobi_base(&a, &m);
         assert_eq!(expected, result);
+
+        let result_taiko = jacobi_taiko::<2>(&a.to_u64_digits().1, &m.to_u64_digits().1);
+        assert_eq!(expected, result_taiko as i8);
     }
 }
 
